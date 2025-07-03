@@ -1,0 +1,19 @@
+{
+  "id": "e8d067f9-ec4e-4392-8086-1047edd4386a",
+  "name": "socitasProject",
+  "publisher": "Sinan",
+  "version": "1.0.0.0",
+  "platform": "26.0.0.0",
+  "application": "26.0.0.0",
+  "idRanges": [
+    {
+      "from": 50100,
+      "to": 50149
+    }
+  ],
+  "runtime": "14.0",
+  "features": [
+    "NoImplicitWith"
+  ],
+  "dependencies": []
+}

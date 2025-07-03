@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Sandbox",
+      "type": "al",
+      "request": "launch",
+      "environmentType": "Sandbox",
+      "environmentName": "Sandbox",
+      "server": "https://businesscentral.dynamics.com",
+      "tenant": "b17f1691-4cfc-4830-9ea9-c9b3bbd12a41",
+      "startupObjectId": 50100,
+      "startupObjectType": "Page",
+      // "schemaUpdateMode": "Recreate"
+    }
+  ]
+}
