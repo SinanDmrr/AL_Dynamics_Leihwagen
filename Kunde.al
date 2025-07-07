@@ -31,52 +31,22 @@ table 50100 Kunde
     {
         key(PK; "Kunden-Nr")
         {
+            //heißt, dass die Daten physisch auf der Festplatte in der Reihenfolge dieses Schlüssels gespeichert werden (Clustern).
+            // Das verbessert die Performance bei Abfragen nach diesem Schlüssel.
             Clustered = true;
         }
     }
 
     trigger OnInsert()
     var
-        KundeRec: Record Kunde;
+        KundeRec: Record Kunde; // Gesamte Tabelle die hinterlegt ist
         MaxNr: Integer;
     begin
-        if Rec."Kunden-Nr" = 0 then begin
-            if KundeRec.FindLast() then
-                MaxNr := KundeRec."Kunden-Nr"
-            else
-                MaxNr := 0;
+        if KundeRec.FindLast() then
+            MaxNr := KundeRec."Kunden-Nr"
+        else
+            MaxNr := 0;
 
-            Rec."Kunden-Nr" := MaxNr + 1;
-        end;
+        Rec."Kunden-Nr" := MaxNr + 1;   // Rec."Kunden-Nr" -> Aktueller Datensatz der den trigger ausgelöst hat. -> Automatische erhöhung des PK beim neu anlegen eines Kundens
     end;
-
-
-
-
-    // SORGT FÜR FEHLER DER ERSTE WERT STARTET MIT KNr-100 
-    // trigger OnInsert()
-    // var
-    //     KundeRec: Record Kunde;
-    //     AktuelleNummer: Integer;
-    //     MaxNummer: Integer;
-    //     NummerText: Text;
-    // begin
-    //     if "Kunden-Nr" = '' then begin
-    //         MaxNummer := 0;
-
-    //         if KundeRec.FindSet() then begin
-    //             repeat
-    //                 if CopyStr(KundeRec."Kunden-Nr", 1, 4) = 'KNr-' then begin
-    //                     NummerText := CopyStr(KundeRec."Kunden-Nr", 5);
-    //                     if Evaluate(AktuelleNummer, NummerText) then begin
-    //                         if AktuelleNummer > MaxNummer then
-    //                             MaxNummer := AktuelleNummer;
-    //                     end;
-    //                 end;
-    //             until KundeRec.Next() = 0;
-    //         end;
-
-    //         "Kunden-Nr" := 'KNr-' + PadStr(Format(MaxNummer + 1), 3, '0');
-    //     end;
-    // end;
 }

@@ -24,7 +24,7 @@ table 50101 Leihwagen
             DecimalPlaces = 2;
             MinValue = 0;
         }
-        field(4; "Status"; Option)
+        field(4; "Status"; Option) // Option Datentyp initialisiert ein Dropdownmenü mit den OptionMembers
         {
             Caption = 'Status';
             OptionMembers = Frei,Vermietet;
@@ -33,8 +33,9 @@ table 50101 Leihwagen
         {
             Caption = 'Kunden-Nummer';
             DataClassification = CustomerContent;
-            TableRelation = Kunde."Kunden-Nr";
-            ValidateTableRelation = true;
+            TableRelation = Kunde."Kunden-Nr"; // Verknüpft dieses Feld mit der "Kunden-Nr" aus der table Kunde
+            // Lookup Verhalten von TableRelation sorgt automatisch dafür das ein Dropdownmenü erscheint mit den Kundennummern
+            ValidateTableRelation = true; // Prüft ob der Kunde wirklich vorhanden ist
             Editable = false;
         }
     }
@@ -45,7 +46,7 @@ table 50101 Leihwagen
         {
             Clustered = true;
         }
-        key(ForeignKeyKunde; "Kunden-Nr")
+        key(ForeignKeyKunde; "Kunden-Nr") //Field 5 wird als ForeignKey genommen und die Tablenabhängikeit mit der table Kunde.Spalte Kunden-Nr gleich gesetzt
         {
         }
     }
@@ -55,13 +56,11 @@ table 50101 Leihwagen
         LeihwagenRec: Record Leihwagen;
         MaxNr: Integer;
     begin
-        if Rec."Leihwagen-Nr" = 0 then begin
-            if LeihwagenRec.FindLast() then
-                MaxNr := LeihwagenRec."Leihwagen-Nr"
-            else
-                MaxNr := 0;
+        if LeihwagenRec.FindLast() then
+            MaxNr := LeihwagenRec."Leihwagen-Nr"
+        else
+            MaxNr := 0;
 
-            Rec."Leihwagen-Nr" := MaxNr + 1
-        end;
+        Rec."Leihwagen-Nr" := MaxNr + 1
     end;
 }
