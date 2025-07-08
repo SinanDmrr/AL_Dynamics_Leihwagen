@@ -25,9 +25,6 @@ page 50104 KundenLeihwagenListe
                     // OnValidate also wenn was validiert wird da es sich im Field des DD-Menü befindet wird es
                     // getriggert, wenn der User ein Kunden aus dem Dropdown-Menü auswählt
                     trigger OnValidate()
-                    var
-                        CustomerRec: Record Kunde;
-                    //Logik steht immer zwischen begin und end;
                     begin
                         //Ruf die Funktionen UpdateLeihwagenList() und CalculateTotalCost() nacheinander auf
                         UpdateLeihwagenList(); //Aktualisiert die Liste der Leihwagen basierend auf der ausgewählten Kunden-Nr
@@ -41,17 +38,13 @@ page 50104 KundenLeihwagenListe
                     Editable = false;
                 }
             }
-            //Startet den repeater-Bereich, der eine Tabelle mit wiederholten Zeilen erstellt. 
-            // Jede Zeile zeigt einen Leihwagen-Datensatz aus der temporären Leihwagen-Tabelle (Rec).
-            // repeater ist wie eine FOREACH in anderen sprachen
+
+            // Neue Section
             repeater(Group)
             {
-                // Rec. ist von Business Central vordefiniert und gibt den aktuellen Datensatz (Record) wieder
-                // da oben SourceTable = Leihwagen definiert wurde bezieht sich Rec. auf Leihwagen und kann deshalb
-                // Rec."Leihwagen-Nr" machen also auf die Werte auf Leihwagen Table zugreifen
                 field("Leihwagen-Nr"; Rec."Leihwagen-Nr")
                 {
-                    Editable = false; // Nicht editierbar / bearbeitbar vom User
+                    Editable = false;
                 }
                 field(Marke; Rec.Marke)
                 {
@@ -74,7 +67,8 @@ page 50104 KundenLeihwagenListe
                     Editable = false;
                 }
             }
-            // Neue Gruppe / Container wird erstellt namens Total
+
+            // Neue Section / Container wird erstellt namens Total
             group(Total)
             {
                 Caption = 'Gesamt'; // Überschrift 
@@ -89,7 +83,8 @@ page 50104 KundenLeihwagenListe
         }
     }
 
-    // GLOBALE VARIABLEN WERDEN HIER DEFINIERT
+    // GLOBALE VARIABLEN WERDEN HIER DEFINIERT 
+    // ACHTUNG NUR HIER! NICHT WIE IN ANDEREN SPRACHEN (C#, JAVASCRIPT) OBEN 
     var
         SelectedCustomer: Integer;
         SelectedCustomerName: Text[100];
@@ -105,18 +100,17 @@ page 50104 KundenLeihwagenListe
         Rec.DeleteAll(); // Löscht die Liste bevor neue Daten eingefügt werden
         // Prüft ob SelectedCustomer UNGLEICH (<>) 0 ist -> Kein Kunde ausgewählt
         if SelectedCustomer <> 0 then begin
-            // Filtert und gibt nur die wo Kunden-Nr mit SelectedCustomer übereinstimmen
+            // Filtert nur Datensätze, bei denen Kunden-Nr = SelectedCustomer ist.
+            // Setzt also ein Filter auf den Record und gibt dann bei FindSet nur noch die Records an die dem Filteralgorithmus entsprechen
             LeihwagenRec.SetRange("Kunden-Nr", SelectedCustomer);
-            // Wird nicht benötigt da ich nur Kunden Nr erhalte wenn es auch vermietet ist.
-            // LeihwagenRec.SetRange(Status, LeihwagenRec.Status::Vermietet);
-            if LeihwagenRec.FindSet() then
-                repeat
+            if LeihwagenRec.FindSet() then // Wenn die Filterung erfolgreich ist und was gefunden wurde DANN
+                repeat  // Wiederhole
                     Rec.Init(); // Initialisiert eine neue temporäre Tabelle mit leerem Datensatz
                     Rec.TransferFields(LeihwagenRec); // Kopiert den leeren Datensatz mit den Gefilterten LeihwagenRec
                     Rec.Insert();  // Fügt es nun in Rec
-                until LeihwagenRec.Next() = 0; // While schleife geht immer zum nächsten Datensatz bis 0 
+                until LeihwagenRec.Next() = 0; // While schleife geht immer zum nächsten Datensatz bis 0 erreicht ist
         end;
-        //* WICHTIG:
+        //* ------------------ WICHTIG: -------------------
         /* Alle funktionen innerhalb einer trigger OnValidation laufen erst ab und am Ende macht Business Central
             CurrPage.Update() d.h. man kann es auch hier schon implementieren der würde trotzdem noch die nächste
             Funktion CalculateTotalCost() abarbeiten und erst danach die Page Updaten aber um es klarer zu 
@@ -125,7 +119,6 @@ page 50104 KundenLeihwagenListe
         */
     end;
 
-    // Erneut eine Funktion die diesemal 
     local procedure CalculateTotalCost()
     var
         LeihwagenRec: Record Leihwagen;
@@ -157,7 +150,7 @@ page 50104 KundenLeihwagenListe
     begin
         if SelectedCustomer <> 0 then   // IF SelectedCustomer UNGLEICH 0 Dann                                        
             if CustomerRec.Get(SelectedCustomer) then // IF im PrimaryKey vom CustomerRec die GLEICHE Nummer wie im SelectedCustomer vorkommt DANN
-                exit(CustomerRec.Name); //Return Wert CustomerName oben bei der Variable CustomerName
-        exit(''); // Ansonsten Return nichts 
+                exit(CustomerRec.Name); // EXIT = Return -> Wert CustomerName oben bei der Variable CustomerName
+        exit(''); // Ansonsten Return (Exit) nichts 
     end;
 }
